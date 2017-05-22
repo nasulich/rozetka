@@ -17,7 +17,8 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.DomSerializer;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-
+import org.w3c.dom.NodeList;
+import org.json.JSONObject;
 
 public class withOutSelenium {
 
@@ -51,6 +52,20 @@ public class withOutSelenium {
 		assertEquals("Ром Captain Morgan Spiced Gold 0.7 л 35% (5000299223017) ",
 				(String) xpath.evaluate(".//*[@class='detail-title']",
 						doc, XPathConstants.STRING));
+        ////Show USDproduct price///////
+        NodeList n = doc.getElementsByTagName("script");//6
+        for(int i = 0; i< n.getLength();i++)
+        {
+            if (n.item(i).getTextContent().indexOf("dataLayer.push") == 5)
+            {
+                String original = n.item(i).getTextContent();
+                String json = original.substring(original.indexOf("(")+1, original.indexOf(");"));
+
+                JSONObject obj = new JSONObject(json);
+                String pageName = obj.getString("productPrice");
+                System.out.println("Price in USD = " + pageName);
+            }
+        }
 	}
 
 	@Test(dependsOnMethods = "searchProductByArticleWithoutSelenium")
