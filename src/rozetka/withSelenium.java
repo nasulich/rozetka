@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class withSelenium {
 	WebDriver driver;
 	String baseUrl;
+	String bankUrl;
 
 	@BeforeClass
 	public void setUp() throws Exception {
@@ -19,6 +20,7 @@ public class withSelenium {
 		//System.setProperty("webdriver.chrome.driver", "libs/chromedriver");
 		
 		baseUrl = "http://rozetka.com.ua/";
+		bankUrl = "https://bank.gov.ua/control/uk/curmetal/detail/currency?period=daily";
 		driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
@@ -42,6 +44,7 @@ public class withSelenium {
 
 	@AfterClass
 	public void tearDown() throws Exception {
+		System.out.println("Price in USD = " + priceUSD(Double.parseDouble(driver.findElement(By.id("price_label")).getText())));
 		driver.quit();
 	}
 
@@ -49,5 +52,11 @@ public class withSelenium {
 		driver.findElement(By.name("text")).clear();
 		driver.findElement(By.name("text")).sendKeys(article);
 		driver.findElement(By.name("rz-search-button")).click();
+	}
+
+	private double priceUSD(double priceUAH)
+	{
+		driver.get(bankUrl);
+		return (priceUAH*100) / Double.parseDouble(driver.findElement(By.xpath("html/body/table/tbody/tr/td[2]/table/tbody/tr/td[2]/div[4]/table[4]/tbody/tr[9]/td[5]")).getText());
 	}
 }
